@@ -1,9 +1,10 @@
 import os
+from contextlib import contextmanager
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 load_dotenv()
 
@@ -34,3 +35,16 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Declarative base for model classes
 Base = declarative_base()
+
+
+@contextmanager
+def get_db_session():
+    """
+    Dependency to get a database session.
+    Yields a database session and ensures it is closed after use.
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
